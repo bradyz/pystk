@@ -1,29 +1,45 @@
 name: Build
-
 on:
   push:
     tags:
       - "v*"
-
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Wheel ${{ matrix.os }} - Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-20.04, windows-2019, macOS-10.15]
-
+        os: [ubuntu-latest, windows-latest, macos-14]
+        python-version: ["38", "39", "310", "311", "312"]
     steps:
       - uses: actions/checkout@v4
-
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.18.1
-
+        env:
+          CIBW_BUILD: cp${{ matrix.python-version }}-*
+          CIBW_BUILD_VERBOSITY: 3
+          CIBW_SKIP: "*musllinux*"
+          # Platform-specific architecture settings
+          CIBW_ARCHS_LINUX: "x86_64 aarch64"
+          CIBW_ARCHS_WINDOWS: "AMD64 ARM64"
+          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          # Platform-specific environment variables
+          CIBW_ENVIRONMENT_LINUX: >
+            CFLAGS="-I/usr/include/GL" LDFLAGS="-L/usr/lib64 -lGL"
+          CIBW_ENVIRONMENT_WINDOWS: >
+            INCLUDE="C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"
+            CMAKE_VERBOSE_MAKEFILE=ON
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
+            auditwheel repair -w {dest_dir} {wheel} ||
+            cp {wheel} {dest_dir}/
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: wheels-${{ matrix.python-version }}-${{ matrix.os }}
           path: ./wheelhouse/*.whl
-
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:

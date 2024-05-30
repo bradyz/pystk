@@ -1,5 +1,6 @@
 import argparse
 
+import numpy as np
 import pystk
 
 
@@ -46,13 +47,7 @@ if __name__ == "__main__":
     for i in range(1, args.num_player):
         race_config.players.append(pystk.PlayerConfig(args.kart, pystk.PlayerConfig.Controller.AI_CONTROL))
 
-    try:
-        import numpy as np
-        random_sa = np.random.rand(1000, 2)
-    except ImportError:
-        print('numpy not found, using random instead')
-        import random
-        random_sa = [(random.random(), random.random()) for _ in range(1000)]
+    random_sa = np.random.rand(1000, 2)
 
     configs = {
         'none': pystk.GraphicsConfig.none(),

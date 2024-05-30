@@ -26,10 +26,11 @@ python setup.py bdist_wheel
 # Install the built wheel, check if it's the right path
 WHEEL_PATH=$(ls -t dist/*.whl | head -n 1)
 
-echo "Installing wheel $WHEEL_PATH..."
-pip install $WHEEL_PATH
+echo "Installing wheel $WHEEL_PATH"
+pip install --force-reinstall $WHEEL_PATH
 
 # Some basic tests
+pip install numpy
 python examples/benchmark.py
 python examples/test_pickle.py
 

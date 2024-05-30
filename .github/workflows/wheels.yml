@@ -14,70 +14,20 @@ jobs:
     name: Build wheel for cp${{ matrix.python }}-${{ matrix.platform_id }}-${{ matrix.manylinux_image }}
     runs-on: ${{ matrix.os }}
 
-    # strategy:
-    #   matrix:
-    #     os: [ubuntu-20.04, macOS-10.15]
-
     strategy:
       # Ensure that a wheel builder finishes even if another fails
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            python: 38
-            platform_id: manylinux_x86_64
-            manylinux_image: manylinux2014
-          - os: ubuntu-latest
-            python: 39
-            platform_id: manylinux_x86_64
-            manylinux_image: manylinux2014
-          - os: ubuntu-latest
-            python: 310
-            platform_id: manylinux_x86_64
-            manylinux_image: manylinux2014
-          - os: ubuntu-latest
-            python: 311
-            platform_id: manylinux_x86_64
-            manylinux_image: manylinux2014
-          # doesnt work yet
-          # - os: ubuntu-latest
-          #   python: 312
-          #   platform_id: manylinux_x86_64
-          #   manylinux_image: manylinux2014
-
-          # MacOS x86_64
-          - os: macos-12
-            python: 38
-            platform_id: macosx_x86_64
-          - os: macos-12
-            python: 39
-            platform_id: macosx_x86_64
-          - os: macos-12
-            python: 310
-            platform_id: macosx_x86_64
-          - os: macos-12
-            python: 311
-            platform_id: macosx_x86_64
-
-          # MacOS arm64
-          - os: macos-14
-            python: 38
-            platform_id: macosx_arm64
-          - os: macos-14
-            python: 39
-            platform_id: macosx_arm64
-          - os: macos-14
-            python: 310
-            platform_id: macosx_arm64
-          - os: macos-14
-            python: 311
-            platform_id: macosx_arm64
+        os: [ubuntu-latest, windows-latest, macos-12, macos-14]
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.18.1
+        env:
+          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-*"
+          CIBW_BUILD_VERBOSITY: 3
 
       - uses: actions/upload-artifact@v4
         with:

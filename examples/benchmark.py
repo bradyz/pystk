@@ -1,6 +1,7 @@
 import argparse
-import pystk
 from time import time
+
+import pystk
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -10,15 +11,21 @@ if __name__ == "__main__":
     parser.add_argument('-n', '--num_player', type=int, default=1)
     args = parser.parse_args()
 
-    for config in [pystk.GraphicsConfig.ld(), pystk.GraphicsConfig.sd(), pystk.GraphicsConfig.hd(), None]:
-        print(config)
-        t0 = time()
-        render = True
-        if config is None:
-            config = pystk.GraphicsConfig.ld()
-            render = False
+    configs = {
+        'none': pystk.GraphicsConfig.none(),
+        'ld': pystk.GraphicsConfig.ld(),
+        'sd': pystk.GraphicsConfig.sd(),
+        'hd': pystk.GraphicsConfig.hd(),
+    }
+
+    for config_name, config in configs.items():
+        print(config_name)
+
+        # works even with pystk.GraphicsConfig.none
         config.screen_width = 320
         config.screen_height = 240
+
+        t0 = time()
         pystk.init(config)
         init_time, t0 = time() - t0, time()
 
@@ -50,11 +57,19 @@ if __name__ == "__main__":
             race.restart()
         restart_time, t0 = time() - t0, time()
 
-        print('  graphics', init_time)
-        print('  race config', race_time)
-        print('  start', start_time)
-        print('  restart', restart_time / 5.)
-        print('  step FPS', 500. / step_time)
+        times = {
+            'graphics': init_time,
+            'race config': race_time,
+            'start': start_time,
+            'restart': restart_time / 5.,
+            'step FPS': 500. / step_time,
+        }
+        times = {k: f'{v:.3f}' for k, v in times.items()}
+        max_key = max(map(len, times.keys()))
+        max_val = max(map(len, times.values()))
+
+        for key, value in times.items():
+            print(f"  {key+':':{max_key+2}} {value:>{max_val}}")
 
         race.stop()
         del race

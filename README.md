@@ -24,9 +24,9 @@ The software is released under the GNU General Public License (GPL) which can be
 
 ### Development
 
-We should support
-- OS: Linux, MacOS
-- Python: 3.6, 3.7, 3.8, 3.9, 3.10, 3.11
+Supports
+- **OS:** Linux, MacOS, ~~Windows~~
+- **Python:** 3.6, 3.7, 3.8, 3.9, 3.10, 3.11
 
 Tested so far
 - Linux 3.6, 3.11
@@ -43,6 +43,11 @@ source make_wheel.sh $PYTHON_VERSION
 
 ### Release
 
+Relevant files:
+- `.github/workflows/wheels.yml`
+- `CMakeLists.txt`
+
+Workflow:
 ```bash
 TAGNAME=v0.5
 
@@ -58,8 +63,8 @@ git push origin master
 
 # REQUIRED: for CI to start building
 git push origin $TAGNAME
-
-
 ```
+
+Then check out the TAGS tab in the github repo to see the build and pray there's no failures
 
 

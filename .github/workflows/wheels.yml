@@ -18,7 +18,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-13]
         arch: [x86_64, arm64]
-        python-version: [3.8, 3.9, 3.10, 3.11]
+        python-version: ["38", "39", "310", "311"]
         exclude:
           - os: macos-13
             arch: arm64
@@ -29,18 +29,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.18.1
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_SKIP: "*musllinux*"
+          CIBW_BUILD: cp${{ matrix.python-version }}-*
           CIBW_BUILD_VERBOSITY: 3
-          CIBW_BUILD: cp${{ matrix.python-version }}-${{ matrix.arch }}
+          CIBW_SKIP: "*musllinux*"
           CIBW_ARCHS_LINUX: ${{ matrix.arch }}
           CIBW_ENVIRONMENT_LINUX: >
             CFLAGS="-I/usr/include/GL" LDFLAGS="-L/usr/lib64 -lGL"
@@ -50,7 +45,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ matrix.arch }}-${{ strategy.job-index }}
+          name: wheels-${{ matrix.python-version }}-${{ matrix.os }}-${{ matrix.arch }}
           path: ./wheelhouse/*.whl
 
       - name: Upload binaries to release

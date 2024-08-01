@@ -33,7 +33,7 @@ jobs:
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
             auditwheel repair -w {dest_dir} {wheel} ||
             cp {wheel} {dest_dir}/
-          CIBW_ARCHS: "x86_64 arm64"
+          CIBW_ARCHS: "universal2"
 
       - uses: actions/upload-artifact@v4
         with:

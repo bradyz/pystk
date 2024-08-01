@@ -124,27 +124,15 @@ endif()
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
 
-if(APPLE)
-    if(NOT IOS)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -F/Library/Frameworks")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -F/Library/Frameworks")
+if(APPLE AND NOT IOS)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -F/Library/Frameworks")
+
+    if(CMAKE_OSX_ARCHITECTURES MATCHES "arm64")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPNG_ARM_NEON_OPT=0")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPNG_ARM_NEON_OPT=0")
     endif()
     
-    # Apple Silicon specific settings
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
-        set(CMAKE_SYSTEM_PROCESSOR "arm64")
-        set(CMAKE_OSX_ARCHITECTURES "arm64")
-        
-        # Remove problematic flags
-        string(REPLACE "-mimplicit-it=always" "" CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS}")
-        
-        # Add specific flags for macOS
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=unused-command-line-argument")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=unused-command-line-argument")
-        
-        # Disable ARM-specific optimizations if needed
-        set(AS_NO_ARM_OPTIMIZATIONS ON CACHE BOOL "Disable ARM optimizations" FORCE)
-    endif()
 elseif(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")   # Enable multi-processor compilation (faster)
 endif()

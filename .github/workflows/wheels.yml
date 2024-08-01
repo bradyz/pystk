@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build_wheels:
-    name: Build wheel for ${{ matrix.os }} (${{ matrix.arch }})
+    name: Build wheel for ${{ matrix.os }} (${{ matrix.arch }}) {{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -28,11 +28,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.arch }}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.18.1

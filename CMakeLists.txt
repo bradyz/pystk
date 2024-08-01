@@ -83,6 +83,11 @@ set(SKIP_INSTALL_ALL TRUE)
 set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
 set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
 set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
+
+if(APPLE AND CMAKE_OSX_ARCHITECTURES MATCHES "arm64")
+    set(PNG_ARM_NEON_OPT 0 CACHE STRING "Disable ARM NEON optimizations" FORCE)
+endif()
+
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
 include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
 

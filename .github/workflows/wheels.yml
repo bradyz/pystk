@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build_wheels:
-    name: Build wheel for ${{ matrix.os }} (${{ matrix.arch }}) {{ matrix.python-version }}
+    name: Build wheels on ${{ matrix.os }} - Python ${{ matrix.python-version }} (${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -29,12 +29,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.18.1
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_SKIP: "*musllinux*"
           CIBW_BUILD_VERBOSITY: 3
+          CIBW_BUILD: cp${{ matrix.python-version }}-${{ matrix.arch }}
+          CIBW_ARCHS_LINUX: ${{ matrix.arch }}
           CIBW_ENVIRONMENT_LINUX: >
             CFLAGS="-I/usr/include/GL" LDFLAGS="-L/usr/lib64 -lGL"
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: >

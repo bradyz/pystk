@@ -38,7 +38,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.18.1
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BUILD: "cp${{ matrix.python-version//'.' }}-*"
+          CIBW_BUILD: "cp${{ matrix.python-version.replace('.', '') }}-*"
           CIBW_SKIP: "*musllinux*"
           CIBW_BUILD_VERBOSITY: 3
           CIBW_ENVIRONMENT_LINUX: >

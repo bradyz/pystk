@@ -85,8 +85,11 @@ set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
 set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
 
 if(APPLE)
-    set(PNG_ARM_NEON_OPT 0 CACHE STRING "Disable ARM NEON optimizations" FORCE)
-
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+        set(PNG_ARM_NEON_OPT 0 CACHE STRING "Disable ARM NEON optimizations" FORCE)
+    endif()
+    
+    message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
     message(STATUS "CMAKE_OSX_ARCHITECTURES: ${CMAKE_OSX_ARCHITECTURES}")
     message(STATUS "PNG_ARM_NEON_OPT: ${PNG_ARM_NEON_OPT}")
 endif()

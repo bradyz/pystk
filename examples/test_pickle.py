@@ -1,6 +1,8 @@
 import argparse
-import pystk
+
 import numpy as np
+import pystk
+
 
 def recursive_cmp(a, b, name=''):
     assert type(a) == type(b), 'Type mismatch for %s: %s vs %s' % (name, type(a), type(b))
@@ -35,6 +37,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     race_config = pystk.RaceConfig()
+
     if args.kart != '':
         race_config.players[0].kart = args.kart
     if args.track is not None:
@@ -46,16 +49,19 @@ if __name__ == "__main__":
 
     random_sa = np.random.rand(1000, 2)
 
-    states = {}
-    for config in [pystk.GraphicsConfig.ld(), pystk.GraphicsConfig.sd(), pystk.GraphicsConfig.hd()]:
-        s_vec = []
-        states[config] = s_vec
+    configs = {
+        'none': pystk.GraphicsConfig.none(),
+        'ld': pystk.GraphicsConfig.ld(),
+        'sd': pystk.GraphicsConfig.sd(),
+        'hd': pystk.GraphicsConfig.hd(),
+    }
 
-        race_config.render = config is not None
-        if not race_config.render:
-            config = pystk.GraphicsConfig.ld()
+    states = {k: [] for k in configs}
+
+    for config_name, config in configs.items():
         config.screen_width = 320
         config.screen_height = 240
+
         pystk.init(config)
 
         race = pystk.Race(race_config)
@@ -65,14 +71,16 @@ if __name__ == "__main__":
         for a, s in random_sa:
             w = pystk.WorldState()
             w.update()
-            s_vec.append(w)
+            states[config_name].append(w)
 
             race.step(pystk.Action(acceleration=a, steer=s))
+
         race.stop()
         del race
         pystk.clean()
 
     state_names = list(states)
+
     for i in range(len(states[state_names[0]])):
         mismatch = False
         for k, n in enumerate(state_names):

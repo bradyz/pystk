@@ -23,12 +23,18 @@ echo "Running setup.py bdist_wheel..."
 export CMAKE_BUILD_PARALLEL_LEVEL=16
 python setup.py bdist_wheel
 
-# Deactivate the environment
-echo "Deactivating environment..."
-#conda deactivate
+# Install the built wheel, check if it's the right path
+WHEEL_PATH=$(ls -t dist/*.whl | head -n 1)
 
-# Remove the environment
-# echo "Removing Anaconda environment $ENV_NAME..."
-# conda env remove --name $ENV_NAME -y
+echo "Installing wheel $WHEEL_PATH"
+pip install --force-reinstall $WHEEL_PATH
 
-# echo "Done."
+# Some basic tests
+pip install numpy
+python examples/benchmark.py
+python examples/test_pickle.py
+
+# Done
+echo "You might want to clean up $ENV_NAME"
+echo "# conda deactivate"
+echo "# conda env remove --name $ENV_NAME -y"

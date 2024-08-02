@@ -19,3 +19,52 @@ To run SuperTuxKart, make sure that your computer's specifications are equal or 
 
 ## License
 The software is released under the GNU General Public License (GPL) which can be found in the file [`COPYING`](/COPYING) in the same directory as this file. Information about the licenses for the artwork is contained in `data/licenses`.
+
+## Notes
+
+### Development
+
+Supports
+- **OS:** Linux, MacOS, ~~Windows~~
+- **Python:** 3.6, 3.7, 3.8, 3.9, 3.10, 3.11
+
+Tested so far
+- Linux 3.6, 3.11
+
+This script creates a temporary conda env + builds the wheel.
+
+TODO: have some automated testing for correctness
+
+```bash
+PYTHON_VERSION=3.11
+
+source make_wheel.sh $PYTHON_VERSION
+```
+
+### Release
+
+Relevant files:
+- `.github/workflows/wheels.yml`
+- `CMakeLists.txt`
+
+Workflow:
+```bash
+TAGNAME=v0.5
+
+git commit -m "new release yay"
+
+# check what tags have been used already
+# git tag
+
+git tag $TAGNAME
+
+# this only pushes the commit
+git push origin master
+
+# REQUIRED: for CI to start building
+git push origin $TAGNAME
+```
+
+Then check out the TAGS tab in the github repo to see the build and pray there's no failures
+
+

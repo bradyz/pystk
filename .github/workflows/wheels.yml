@@ -8,23 +8,26 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }} - Python ${{ matrix.python-version }} (${{ matrix.arch }})
+    name: Wheel ${{ matrix.os }} - Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        arch: [x86_64, arm64]
+        os: [ubuntu-latest, windows-latest, macos-14]
         python-version: ["38", "39", "310", "311", "312"]
     steps:
       - uses: actions/checkout@v4
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.18.1
         env:
-          CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python-version }}-*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_SKIP: "*musllinux*"
+          # Platform-specific architecture settings
+          CIBW_ARCHS_LINUX: "x86_64 aarch64"
+          CIBW_ARCHS_WINDOWS: "AMD64 ARM64"
+          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          # Platform-specific environment variables
           CIBW_ENVIRONMENT_LINUX: >
             CFLAGS="-I/usr/include/GL" LDFLAGS="-L/usr/lib64 -lGL"
           CIBW_ENVIRONMENT_WINDOWS: >
@@ -34,7 +37,7 @@ jobs:
             cp {wheel} {dest_dir}/
       - uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.python-version }}-${{ matrix.os }}-${{ matrix.arch }}
+          name: wheels-${{ matrix.python-version }}-${{ matrix.os }}
           path: ./wheelhouse/*.whl
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2

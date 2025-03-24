@@ -32,6 +32,7 @@ jobs:
             CFLAGS="-I/usr/include/GL" LDFLAGS="-L/usr/lib64 -lGL"
           CIBW_ENVIRONMENT_WINDOWS: >
             INCLUDE="C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"
+            CMAKE_VERBOSE_MAKEFILE=ON
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
             auditwheel repair -w {dest_dir} {wheel} ||
             cp {wheel} {dest_dir}/

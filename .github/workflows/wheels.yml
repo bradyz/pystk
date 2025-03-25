@@ -37,6 +37,81 @@ jobs:
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
             auditwheel repair -w {dest_dir} {wheel} ||
             cp {wheel} {dest_dir}/
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - name: Create wheel test script
+        run: |
+          cat > test_wheel.py << 'EOF'
+          import os
+          import sys
+          import subprocess
+          import glob
+          import platform
+
+          def find_wheels():
+              """Find all wheel files in the wheelhouse directory."""
+              wheels = glob.glob("./wheelhouse/*.whl")
+              if not wheels:
+                  print("No wheels found in ./wheelhouse/")
+                  return []
+              return wheels
+
+          def install_wheel(wheel_path):
+              """Try to install the wheel."""
+              print(f"Installing wheel: {wheel_path}")
+              try:
+                  subprocess.check_call([sys.executable, "-m", "pip", "install", "--force-reinstall", wheel_path])
+                  return True
+              except subprocess.CalledProcessError as e:
+                  print(f"Failed to install wheel: {e}")
+                  return False
+
+          def run_benchmark():
+              """Run the benchmark script."""
+              print("Running benchmark...")
+              try:
+                  result = subprocess.run(
+                      [sys.executable, "examples/benchmark.py"],
+                      capture_output=True,
+                      text=True,
+                      timeout=180
+                  )
+                  print(f"Benchmark stdout:\n{result.stdout}")
+                  if result.stderr:
+                      print(f"Benchmark stderr:\n{result.stderr}")
+                  return result.returncode == 0
+              except Exception as e:
+                  print(f"Error running benchmark: {e}")
+                  return False
+
+          def main():
+              wheels = find_wheels()
+              if not wheels:
+                  sys.exit(1)
+              
+              success = False
+              for wheel in wheels:
+                  if install_wheel(wheel):
+                      if run_benchmark():
+                          print(f"Successfully tested {wheel}")
+                          success = True
+                          break
+                      else:
+                          print(f"Benchmark failed for {wheel}")
+              
+              if not success:
+                  sys.exit(1)
+              
+              print("Wheel test successful!")
+              sys.exit(0)
+
+          if __name__ == "__main__":
+              main()
+          EOF
+      - name: Test wheel
+        run: python test_wheel.py
       - uses: actions/upload-artifact@v4
         with:
           name: wheels-${{ matrix.python-version }}-${{ matrix.os }}
@@ -49,6 +124,3 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
-      - name: Test wheels
-        run: |
-            python test_all_wheels.py

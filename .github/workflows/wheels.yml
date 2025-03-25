@@ -27,6 +27,8 @@ jobs:
           CIBW_BUILD_VERBOSITY: 3
           CIBW_SKIP: "*musllinux*"
           CIBW_ARCHS_MACOS: "x86_64 arm64"
+          CIBW_ENVIRONMENT_MACOS: >
+            CFLAGS="-DPNG_ARM_NEON_OPT=0" CXXFLAGS="-DPNG_ARM_NEON_OPT=0"
           CIBW_ARCHS_LINUX: "x86_64"
           CIBW_ARCHS_WINDOWS: "AMD64"
           CIBW_ENVIRONMENT_LINUX: >

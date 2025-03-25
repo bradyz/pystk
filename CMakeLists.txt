@@ -77,9 +77,14 @@ set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
 set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
 set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
 
+# Add this before the "add_subdirectory" for libpng
 if(APPLE)
+    # Force disable ARM NEON on Apple Silicon
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
         set(PNG_ARM_NEON_OPT 0 CACHE STRING "Disable ARM NEON optimizations" FORCE)
+        set(PNG_ARM_NEON_API_SUPPORTED OFF CACHE BOOL "Disable ARM NEON API" FORCE)
+        set(PNG_ARM_NEON_CHECK_SUPPORTED OFF CACHE BOOL "Disable ARM NEON check" FORCE)
+        add_definitions(-DPNG_ARM_NEON_OPT=0)
     endif()
     
     message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")

@@ -49,3 +49,6 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
+      - name: Test wheels
+        run: |
+            python test_all_wheels.py
